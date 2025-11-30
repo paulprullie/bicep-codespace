@@ -26,12 +26,12 @@ Je leert hoe je:
 │  │ ┌─────────┐ │      │ ┌─────────────┐ │      │  Storage Account    │  │
 │  │ │ Event   │ │      │ │   Azure     │ │      │  (Blob Storage)     │  │
 │  │ │  Hub    │ ├─────►│ │  Function   │ ├─────►│                     │  │
-│  │ └─────────┘ │      │ │             │ │      │  📁 iot-data/       │  │
+│  │ └─────────┘ │      │ │             │ │      │   iot-data/         │  │
 │  │             │      │ │ Event Hub   │ │      │   └── 2025/12/02/14 │  │
-│  │  📨 Events  │      │ │ Trigger     │ │      │       └── events    │  │
+│  │   Events    │      │ │ Trigger     │ │      │       └── events    │  │
 │  └─────────────┘      │ └─────────────┘ │      └─────────────────────┘  │
 │        ▲              │       │         │                               │
-│  ┌─────┴─────┐        │  Managed ID     │  🔐 Geen secrets nodig!       │
+│  ┌─────┴─────┐        │  Managed ID     │                               │
 │  │  Test     │        │  + Blob Output  │                               │
 │  │  Script   │        └─────────────────┘                               │
 │  └───────────┘                                                          │
@@ -56,7 +56,7 @@ Consistente naamgeving is essentieel voor professionele infrastructuur.
 | Virtual Network | `vnet-` | `vnet-iot-workshop` | 2-64 chars |
 | Subnet | `snet-` | `snet-functions` | 1-80 chars |
 
-> 📖 **Bron:** [Azure naming conventions](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming) - Cloud Adoption Framework
+> 📖 **Bron:** [Azure naming conventions](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations) - Cloud Adoption Framework
 
 **Let op bij Storage Accounts:**
 - Maximum 24 karakters
