@@ -417,9 +417,7 @@ What-If toont wat er gaat gebeuren **zonder** te deployen:
 
 ## 🧪 Stap 4: Testen met Event Generator
 
-Na deployment kun je de pipeline testen. Er zijn drie opties beschikbaar:
-
-### Connection String Ophalen
+Na deployment kun je de pipeline testen:
 
 ```bash
 # Haal connection string op via Azure CLI (pas resource group aan!)
@@ -428,29 +426,12 @@ CONNECTION_STRING=$(az eventhubs namespace authorization-rule keys list \
   --namespace-name evhns-iot-workshop-jouwinitialen \
   --name RootManageSharedAccessKey \
   --query primaryConnectionString -o tsv)
+
+# Verstuur test events
+./scripts/send_events.sh --connection-string "$CONNECTION_STRING" --count 10
 ```
 
-### Optie 1: Python Script
-
-```bash
-cd scripts
-pip install -r requirements.txt
-python send_events.py --connection-string "$CONNECTION_STRING" --count 100
-```
-
-### Optie 2: Bash Script (geen Python nodig)
-
-```bash
-cd scripts
-./send_events.sh --connection-string "$CONNECTION_STRING" --count 10
-```
-
-### Optie 3: PowerShell Script
-
-```powershell
-cd scripts
-.\send_events.ps1 -ConnectionString $CONNECTION_STRING -Count 10
-```
+> **PowerShell alternatief:** `.\scripts\send_events.ps1 -ConnectionString $CONNECTION_STRING -Count 10`
 
 Verifieer in de Azure Portal:
 1. Open het Storage Account

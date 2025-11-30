@@ -2,10 +2,7 @@
   "name": "Bicep IaC Workshop Environment",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
   "features": {
-    "ghcr.io/devcontainers/features/azure-cli:1": {},
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.11"
-    }
+    "ghcr.io/devcontainers/features/azure-cli:1": {}
   },
   "customizations": {
     "vscode": {
@@ -14,13 +11,10 @@
       },
       "extensions": [
         "ms-azuretools.vscode-bicep",
-        "ms-azuretools.vscode-azurefunctions",
-        "ms-python.python",
-        "GitHub.vscode-github-actions",
-        "EditorConfig.EditorConfig"
+        "GitHub.vscode-github-actions"
       ]
     }
   },
-  "postCreateCommand": "az bicep install && pip install azure-eventhub azure-identity",
+  "postCreateCommand": "az bicep install",
   "remoteUser": "vscode"
 }

@@ -1,2 +1,0 @@
-# Dependencies voor test scripts
-azure-eventhub>=5.11.0
