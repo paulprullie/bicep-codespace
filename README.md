@@ -127,7 +127,7 @@ Open de terminal in je Codespace en log in bij Azure:
 az login
 ```
 
-> Dit opent een browser voor authenticatie. Na succesvolle login kun je Azure resources beheren via de CLI.
+> In Codespaces krijg je een device code te zien. Volg de instructies op het scherm om te authenticeren.
 
 ---
 
