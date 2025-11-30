@@ -119,34 +119,15 @@ Azure DevOps heeft geen Codespaces, dus we gebruiken een lokale Dev Container:
 
 ---
 
-## 🔑 Stap 1: GitHub/Azure DevOps aan Azure Koppelen
+## 🔑 Stap 1: Azure Login
 
-### Optie A: GitHub Actions
+Open de terminal in je Codespace en log in bij Azure:
 
-1. Open de terminal in je Codespace
-2. Log in bij Azure:
-   ```bash
-   az login
-   ```
-3. Maak een Service Principal aan:
-   ```bash
-   az ad sp create-for-rbac \
-     --name "github-iot-workshop-jouwnaam" \
-     --role contributor \
-     --scopes /subscriptions/<Subscription ID> \
-     --json-auth
-   ```
-4. Ga naar jouw GitHub repo → **Settings** → **Secrets and variables** → **Actions**
-5. Maak secret `AZURE_CREDENTIALS` met de JSON output
+```bash
+az login
+```
 
-> **Let op:** De `--json-auth` optie is deprecated. Deze methode werkt nog, maar in de toekomst wordt [OIDC (OpenID Connect)](https://learn.microsoft.com/azure/developer/github/connect-from-azure?tabs=azure-cli%2Clinux#use-the-azure-login-action-with-openid-connect) de aanbevolen aanpak.
-
-### Optie B: Azure DevOps
-
-1. Ga naar **Project Settings** → **Service connections** → **New**
-2. Kies **Azure Resource Manager** → **Service Principal (automatic)**
-3. Noem de connectie `Azure-Workshop-SC`
-4. Update `azure-pipelines.yml` met deze naam
+> Dit opent een browser voor authenticatie. Na succesvolle login kun je Azure resources beheren via de CLI.
 
 ---
 
@@ -285,6 +266,30 @@ az deployment group what-if \
 We maken een pipeline die:
 1. **Validate** - Bicep syntax check + What-If analyse
 2. **Deploy** - Daadwerkelijke deployment naar Azure
+
+---
+
+### 🔐 Stap 3.0: Azure Credentials voor CI/CD
+
+Voor automatische deployments heeft de pipeline Azure credentials nodig.
+
+**GitHub Actions:**
+
+1. Vraag de trainer om het wachtwoord
+2. Decrypt de credentials:
+   ```bash
+   echo "WACHTWOORD_VAN_TRAINER" > password.txt
+   ./scripts/setup-azure-credentials.sh
+   ```
+3. Ga naar jouw GitHub repo → **Settings** → **Secrets and variables** → **Actions**
+4. Maak secret `AZURE_CREDENTIALS` met de inhoud van `azure-credentials.json`
+
+**Azure DevOps:**
+
+1. Ga naar **Project Settings** → **Service connections** → **New**
+2. Kies **Azure Resource Manager** → **Service Principal (automatic)**
+3. Noem de connectie `Azure-Workshop-SC`
+4. Update `azure-pipelines.yml` met deze naam
 
 ---
 
