@@ -68,7 +68,7 @@ Consistente naamgeving is essentieel voor professionele infrastructuur.
 
 ## 🛠️ Voorbereiding: Je Werkomgeving
 
-We gebruiken een **Dev Container** om ervoor te zorgen dat iedereen dezelfde omgeving heeft met alle tools (**Azure CLI**, **Bicep CLI**, **Python**) geïnstalleerd.
+We gebruiken een **Dev Container** om ervoor te zorgen dat iedereen dezelfde omgeving heeft met alle tools (**Azure CLI**, **Bicep CLI**) geïnstalleerd.
 
 ---
 
@@ -119,7 +119,7 @@ Azure DevOps heeft geen Codespaces, dus we gebruiken een lokale Dev Container:
 
 ---
 
-## 🔑 Stap 1: Azure Login
+## 🔑 Azure Login
 
 Open de terminal in je Codespace en log in bij Azure:
 
@@ -149,7 +149,7 @@ infra/
 
 ---
 
-### ✅ Stap 2.1: Storage Account (`modules/storage.bicep`)
+### ✅ Storage Account (`modules/storage.bicep`)
 
 **Doel:** Blob Storage voor IoT events met virtuele folder structuur
 
@@ -170,7 +170,7 @@ infra/
 
 ---
 
-### ✅ Stap 2.2: Event Hub (`modules/eventhub.bicep`)
+### ✅ Event Hub (`modules/eventhub.bicep`)
 
 **Doel:** Ingestie van IoT events
 
@@ -189,7 +189,7 @@ infra/
 
 ---
 
-### ✅ Stap 2.3: Function App (`modules/function.bicep`)
+### ✅ Function App (`modules/function.bicep`)
 
 **Doel:** Event processing met Managed Identity
 
@@ -216,7 +216,7 @@ appSettings: [
 
 ---
 
-### ✅ Stap 2.4: Main Orchestrator (`main.bicep`)
+### ✅ Main Orchestrator (`main.bicep`)
 
 **Doel:** Alle modules verbinden
 
@@ -269,7 +269,7 @@ We maken een pipeline die:
 
 ---
 
-### 🔐 Stap 3.0: Azure Credentials voor CI/CD
+### 🔐 Azure Credentials voor CI/CD
 
 Voor automatische deployments heeft de pipeline Azure credentials nodig.
 
@@ -293,7 +293,7 @@ Voor automatische deployments heeft de pipeline Azure credentials nodig.
 
 ---
 
-### ✅ Stap 3.1: Workflow bestand maken
+### ✅ Workflow bestand maken
 
 Maak `.github/workflows/deploy.yml`:
 
@@ -363,7 +363,7 @@ jobs:
 
 ---
 
-### ✅ Stap 3.2: Workflow onderdelen uitgelegd
+### ✅ Workflow onderdelen uitgelegd
 
 | Onderdeel | Doel |
 |-----------|------|
@@ -376,7 +376,7 @@ jobs:
 
 ---
 
-### ✅ Stap 3.3: What-If begrijpen
+### ✅ What-If begrijpen
 
 What-If toont wat er gaat gebeuren **zonder** te deployen:
 
@@ -415,7 +415,7 @@ What-If toont wat er gaat gebeuren **zonder** te deployen:
 
 ---
 
-## 🧪 Stap 4: Testen met Event Generator
+## 🧪 Testen met Event Generator
 
 Na deployment kun je de pipeline testen:
 
