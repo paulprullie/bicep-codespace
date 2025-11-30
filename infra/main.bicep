@@ -92,10 +92,9 @@ module functionApp 'modules/function.bicep' = {
   params: {
     workloadName: workloadName
     location: location
-    // TODO: Voeg de overige parameters toe (gebruik outputs van andere modules)
-    // eventHubNamespace: eventHub.outputs.fullyQualifiedNamespace
-    // eventHubName: eventHub.outputs.eventHubName
-    // storageAccountName: storage.outputs.storageAccountName
+    eventHubNamespace: eventHub.outputs.fullyQualifiedNamespace
+    eventHubName: eventHub.outputs.eventHubName
+    storageAccountName: storage.outputs.storageAccountName
   }
 }
 

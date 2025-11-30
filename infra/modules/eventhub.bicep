@@ -18,7 +18,7 @@ param location string = resourceGroup().location
 // TODO: Definieer de resource namen volgens de naming convention
 // - Event Hub Namespace prefix: 'evhns-'
 // - Event Hub naam: 'iot-events'
-var eventHubNamespaceName = 'yourname' // TODO: Pas aan (gebruik evhns- prefix)
+var eventHubNamespaceName = 'evhns-${workloadName}-${uniqueString(resourceGroup().id)}'
 var eventHubName = 'iot-events'
 
 // -----------------------------------------------------------------------------
@@ -42,8 +42,15 @@ var eventHubName = 'iot-events'
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2024-01-01' = {
   name: eventHubNamespaceName
   location: location
-  // TODO: Voeg sku toe
-  // TODO: Voeg properties toe
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+    capacity: 1
+  }
+  properties: {
+    minimumTlsVersion: '1.2'
+    publicNetworkAccess: 'Enabled'
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -60,7 +67,10 @@ resource eventHubNamespace 'Microsoft.EventHub/namespaces@2024-01-01' = {
 resource eventHub 'Microsoft.EventHub/namespaces/eventhubs@2024-01-01' = {
   parent: eventHubNamespace
   name: eventHubName
-  // TODO: Voeg properties toe
+  properties: {
+    messageRetentionInDays: 1
+    partitionCount: 2
+  }
 }
 
 // -----------------------------------------------------------------------------

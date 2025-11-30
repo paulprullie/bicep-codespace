@@ -27,8 +27,8 @@ param storageAccountName string
 // TODO: Definieer de resource namen volgens de naming convention
 // - App Service Plan prefix: 'asp-'
 // - Function App prefix: 'func-'
-var appServicePlanName = 'yourname' // TODO: Pas aan
-var functionAppName = 'yourname'    // TODO: Pas aan
+var appServicePlanName = 'asp-${workloadName}-${uniqueString(resourceGroup().id)}'
+var functionAppName = 'func-${workloadName}-${uniqueString(resourceGroup().id)}'
 
 // -----------------------------------------------------------------------------
 // APP SERVICE PLAN (Consumption)
@@ -49,8 +49,13 @@ var functionAppName = 'yourname'    // TODO: Pas aan
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: appServicePlanName
   location: location
-  // TODO: Voeg sku toe (name: 'Y1', tier: 'Dynamic')
-  // TODO: Voeg properties toe (reserved: true voor Linux)
+  sku: {
+    name: 'Y1'
+    tier: 'Dynamic'
+  }
+  properties: {
+    reserved: true
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -75,9 +80,9 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   name: functionAppName
   location: location
   kind: 'functionapp,linux'
-
-  // TODO: Voeg identity toe met type: 'SystemAssigned'
-  // Dit maakt automatisch een Managed Identity aan!
+  identity: {
+    type: 'SystemAssigned'
+  }
 
   properties: {
     serverFarmId: appServicePlan.id
@@ -105,8 +110,12 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
       // 6. StorageAccountName = storageAccountName
 
       appSettings: [
-        // TODO: Voeg alle app settings toe als objects:
-        // { name: 'SETTING_NAME', value: 'setting_value' }
+        { name: 'AzureWebJobsStorage__accountName', value: storageAccountName }
+        { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
+        { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'python' }
+        { name: 'EventHubConnection__fullyQualifiedNamespace', value: eventHubNamespace }
+        { name: 'EventHubName', value: eventHubName }
+        { name: 'StorageAccountName', value: storageAccountName }
       ]
     }
   }

@@ -21,7 +21,7 @@ param location string = resourceGroup().location
 // - Max 24 karakters, alleen lowercase letters en cijfers
 // - Gebruik uniqueString(resourceGroup().id) voor uniekheid
 // - Prefix: 'st' (geen streepje bij storage accounts!)
-var storageAccountName = 'yourname' // TODO: Pas aan
+var storageAccountName = 'st${uniqueString(resourceGroup().id)}'
 
 // -----------------------------------------------------------------------------
 // STORAGE ACCOUNT
@@ -44,9 +44,16 @@ var storageAccountName = 'yourname' // TODO: Pas aan
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: take(storageAccountName, 24)
   location: location
-  // TODO: Voeg sku toe (name: 'Standard_LRS')
-  // TODO: Voeg kind toe ('StorageV2')
-  // TODO: Voeg properties toe
+  kind: 'StorageV2'
+  sku: {
+    name: 'Standard_LRS'
+  }
+  properties: {
+    accessTier: 'Hot'
+    minimumTlsVersion: 'TLS1_2'
+    supportsHttpsTrafficOnly: true
+    allowBlobPublicAccess: false
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -68,7 +75,9 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
 resource dataContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
   parent: blobService
   name: 'iot-data'
-  // TODO: Voeg properties toe met publicAccess: 'None'
+  properties: {
+    publicAccess: 'None'
+  }
 }
 
 // -----------------------------------------------------------------------------

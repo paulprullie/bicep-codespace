@@ -9,7 +9,7 @@ using './main.bicep'
 // De workload naam wordt gebruikt als prefix voor alle resources
 // BELANGRIJK: Voeg je initialen toe voor een unieke naam!
 // Voorbeeld: 'iot-workshop-jd' voor Jan de Vries
-param workloadName = 'iot-workshop-jouwinitialen'
+param workloadName = 'iot-workshop-cc'
 
 // West Europe is dichtbij en heeft alle services
 param location = 'westeurope'

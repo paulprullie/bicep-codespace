@@ -43,8 +43,7 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@202
   name: guid(storageAccount.id, functionAppPrincipalId, 'Storage Blob Data Contributor')
   scope: storageAccount
   properties: {
-    // TODO: Voeg roleDefinitionId toe
-    // Hint: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '<role-id>')
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
     principalId: functionAppPrincipalId
     principalType: 'ServicePrincipal'
   }
@@ -61,7 +60,7 @@ resource eventHubDataReceiver 'Microsoft.Authorization/roleAssignments@2022-04-0
   name: guid(eventHubNamespace.id, functionAppPrincipalId, 'Event Hubs Data Receiver')
   scope: eventHubNamespace
   properties: {
-    // TODO: Voeg roleDefinitionId toe
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde')
     principalId: functionAppPrincipalId
     principalType: 'ServicePrincipal'
   }
