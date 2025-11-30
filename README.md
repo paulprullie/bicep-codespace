@@ -46,7 +46,7 @@ Consistente naamgeving is essentieel voor professionele infrastructuur.
 
 | Resource Type | Prefix | Voorbeeld | Beperkingen |
 |---------------|--------|-----------|-------------|
-| Resource Group | `rg-` | `rg-iot-workshop` | 1-90 chars |
+| Resource Group | `rg-` | `rg-iot-workshop-jouwinitialen` | 1-90 chars |
 | Storage Account | `st` | `stiotworkshop` | **Max 24 chars, geen streepjes!** |
 | Event Hub Namespace | `evhns-` | `evhns-iot-workshop` | 6-50 chars |
 | Event Hub | - | `iot-events` | Vrije naam binnen namespace |
@@ -138,6 +138,8 @@ Azure DevOps heeft geen Codespaces, dus we gebruiken een lokale Dev Container:
    ```
 4. Ga naar jouw GitHub repo → **Settings** → **Secrets and variables** → **Actions**
 5. Maak secret `AZURE_CREDENTIALS` met de JSON output
+
+> **Let op:** De `--json-auth` optie is deprecated. Deze methode werkt nog, maar in de toekomst wordt [OIDC (OpenID Connect)](https://learn.microsoft.com/azure/developer/github/connect-from-azure?tabs=azure-cli%2Clinux#use-the-azure-login-action-with-openid-connect) de aanbevolen aanpak.
 
 ### Optie B: Azure DevOps
 
@@ -261,10 +263,12 @@ az bicep build --file infra/main.bicep
 
 # What-If (zie wat er gaat gebeuren)
 az deployment group what-if \
-  --resource-group rg-iot-workshop \
+  --resource-group rg-iot-workshop-jouwinitialen \
   --template-file infra/main.bicep \
   --parameters infra/main.bicepparam
 ```
+
+> **Belangrijk:** Vervang `jouwinitialen` door je eigen initialen (bijv. `rg-iot-workshop-jd` voor Jan de Vries). Zo heeft elke student een unieke resource group.
 
 ### 💡 Tips
 
@@ -298,7 +302,7 @@ on:
     branches: [main]
 
 env:
-  RESOURCE_GROUP: rg-iot-workshop
+  RESOURCE_GROUP: rg-iot-workshop-jouwinitialen  # Pas aan naar jouw initialen!
   LOCATION: westeurope
 
 jobs:
@@ -413,10 +417,10 @@ Na deployment kun je de pipeline testen. Er zijn drie opties beschikbaar:
 ### Connection String Ophalen
 
 ```bash
-# Haal connection string op via Azure CLI
+# Haal connection string op via Azure CLI (pas resource group aan!)
 CONNECTION_STRING=$(az eventhubs namespace authorization-rule keys list \
-  --resource-group rg-iot-workshop \
-  --namespace-name evhns-iot-workshop \
+  --resource-group rg-iot-workshop-jouwinitialen \
+  --namespace-name evhns-iot-workshop-jouwinitialen \
   --name RootManageSharedAccessKey \
   --query primaryConnectionString -o tsv)
 ```
