@@ -2,7 +2,7 @@
 // Storage Account met Blob Container
 // =============================================================================
 // Dit storage account wordt gebruikt voor het opslaan van IoT events
-// Virtuele folders via blob namen: 2025/12/02/14/30/events.json
+// Virtuele folders via blob namen: 2025/12/02/14/events.json
 // =============================================================================
 
 @description('Naam van het workload (gebruikt voor resource naming)')
