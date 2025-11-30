@@ -1,0 +1,12 @@
+# Credentials (nooit committen!)
+azure-credentials.json
+password.txt
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# IDE
+.idea/
+*.swp
