@@ -1,8 +1,11 @@
 {
   "name": "Bicep IaC Workshop Environment",
-  "dockerFile": "Dockerfile",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    }
   },
   "customizations": {
     "vscode": {
@@ -10,19 +13,14 @@
         "terminal.integrated.defaultProfile.linux": "bash"
       },
       "extensions": [
-        "ms-azuretools.vscode-bicep",        // Essentiële Bicep ondersteuning
-        "ms-azuretools.vscode-azurefunctions", // Azure Functions
-        "ms-python.python",                  // Python ondersteuning
-        "GitHub.vscode-github-actions",      // GitHub Actions
-        "EditorConfig.EditorConfig"          // Consistentie in code
+        "ms-azuretools.vscode-bicep",
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-python.python",
+        "GitHub.vscode-github-actions",
+        "EditorConfig.EditorConfig"
       ]
     }
   },
-  
-  // Script om direct na het aanmaken van de container uit te voeren
-  "postCreateCommand": "echo 'Bicep en Azure CLI zijn geïnstalleerd.'",
-
-  // Stel de poorten in (niet strikt noodzakelijk, maar handig)
-  "forwardPorts": [],
+  "postCreateCommand": "az bicep install && pip install azure-eventhub azure-identity",
   "remoteUser": "vscode"
 }
