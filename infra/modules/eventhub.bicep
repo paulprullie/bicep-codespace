@@ -11,9 +11,6 @@ param workloadName string
 @description('Locatie voor de resources')
 param location string = resourceGroup().location
 
-@description('Principal ID van de Function App voor RBAC')
-param functionAppPrincipalId string
-
 // -----------------------------------------------------------------------------
 // VARIABELEN
 // -----------------------------------------------------------------------------
@@ -77,26 +74,6 @@ resource eventHub 'Microsoft.EventHub/namespaces/eventhubs@2024-01-01' = {
 resource consumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2024-01-01' = {
   parent: eventHub
   name: 'function-consumer'
-}
-
-// -----------------------------------------------------------------------------
-// RBAC: Event Hubs Data Receiver
-// -----------------------------------------------------------------------------
-
-// TODO: Ken de 'Azure Event Hubs Data Receiver' rol toe aan de Function App
-// Dit zorgt ervoor dat de Function App events kan lezen via Managed Identity
-//
-// Role Definition ID voor Azure Event Hubs Data Receiver:
-// a638d3c7-ab3a-418d-83e6-5f17a39d4fde
-
-resource eventHubDataReceiver 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(eventHubNamespace.id, functionAppPrincipalId, 'Event Hubs Data Receiver')
-  scope: eventHubNamespace
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde')
-    principalId: functionAppPrincipalId
-    principalType: 'ServicePrincipal'
-  }
 }
 
 // -----------------------------------------------------------------------------

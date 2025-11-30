@@ -11,9 +11,6 @@ param workloadName string
 @description('Locatie voor de resources')
 param location string = resourceGroup().location
 
-@description('Principal ID van de Function App voor RBAC')
-param functionAppPrincipalId string
-
 // -----------------------------------------------------------------------------
 // VARIABELEN
 // -----------------------------------------------------------------------------
@@ -72,28 +69,6 @@ resource dataContainer 'Microsoft.Storage/storageAccounts/blobServices/container
   parent: blobService
   name: 'iot-data'
   // TODO: Voeg properties toe met publicAccess: 'None'
-}
-
-// -----------------------------------------------------------------------------
-// RBAC: Storage Blob Data Contributor
-// -----------------------------------------------------------------------------
-
-// TODO: Ken de 'Storage Blob Data Contributor' rol toe aan de Function App
-// Dit zorgt ervoor dat de Function App blobs kan schrijven via Managed Identity
-//
-// Role Definition ID voor Storage Blob Data Contributor:
-// ba92f5b4-2d11-453d-a403-e96b0029c9fe
-//
-// Documentatie: https://learn.microsoft.com/azure/templates/microsoft.authorization/roleassignments
-
-resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionAppPrincipalId, 'Storage Blob Data Contributor')
-  scope: storageAccount
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
-    principalId: functionAppPrincipalId
-    principalType: 'ServicePrincipal'
-  }
 }
 
 // -----------------------------------------------------------------------------

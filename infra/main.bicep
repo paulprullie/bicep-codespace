@@ -5,105 +5,117 @@
 // De volgorde is belangrijk vanwege dependencies!
 // =============================================================================
 
-targetScope = 'resourceGroup'
+targetScope = 'subscription'
 
 @description('Naam van het workload (wordt gebruikt als prefix voor alle resources)')
 param workloadName string
 
 @description('Locatie voor alle resources')
-param location string = resourceGroup().location
+param location string
+
+// =============================================================================
+// RESOURCE GROUP
+// =============================================================================
+
+// TODO: Maak de Resource Group aan
+// Documentatie: https://learn.microsoft.com/azure/templates/microsoft.resources/resourcegroups
+//
+// Tips:
+// - Gebruik de naming convention: rg-<workloadName>
+// - location komt uit de parameter
+
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
+  name: 'rg-${workloadName}'
+  location: location
+}
 
 // =============================================================================
 // MODULE AANROEPEN
 // =============================================================================
 //
-// Let op de volgorde en dependencies:
-// 1. Function App moet EERST (we hebben de Managed Identity Principal ID nodig)
-// 2. Storage en Event Hub kunnen daarna (ze krijgen de Principal ID als parameter)
-//
-// De Principal ID van de Function App wordt gebruikt om RBAC roles toe te kennen
-// zodat de Function App toegang krijgt tot Storage en Event Hub via Managed Identity
+// Let op de volgorde (geen circulaire dependencies!):
+// 1. Storage Account (resources aanmaken)
+// 2. Event Hub (resources aanmaken)
+// 3. Function App (heeft Storage en Event Hub info nodig voor app settings)
+// 4. RBAC (heeft Function App principalId nodig)
 //
 // =============================================================================
 
 // -----------------------------------------------------------------------------
-// STAP 1: Function App (eerst voor Managed Identity)
+// STAP 1: Storage Account
+// -----------------------------------------------------------------------------
+
+// TODO: Roep de storage module aan
+// Documentatie: https://learn.microsoft.com/azure/azure-resource-manager/bicep/modules
+
+module storage 'modules/storage.bicep' = {
+  name: 'deploy-storage'
+  scope: resourceGroup
+  params: {
+    workloadName: workloadName
+    location: location
+  }
+}
+
+// -----------------------------------------------------------------------------
+// STAP 2: Event Hub
+// -----------------------------------------------------------------------------
+
+// TODO: Roep de eventhub module aan
+
+module eventHub 'modules/eventhub.bicep' = {
+  name: 'deploy-eventhub'
+  scope: resourceGroup
+  params: {
+    workloadName: workloadName
+    location: location
+  }
+}
+
+// -----------------------------------------------------------------------------
+// STAP 3: Function App
 // -----------------------------------------------------------------------------
 
 // TODO: Roep de function module aan
-// Documentatie: https://learn.microsoft.com/azure/azure-resource-manager/bicep/modules
-//
-// Syntax:
-// module <naam> '<pad-naar-module>' = {
-//   name: '<deployment-naam>'
-//   params: {
-//     param1: value1
-//     param2: value2
-//   }
-// }
+// De Function App heeft de outputs van Storage en Event Hub nodig
 //
 // Parameters die de function module nodig heeft:
 // - workloadName: param workloadName
 // - location: param location
 // - eventHubNamespace: eventHub.outputs.fullyQualifiedNamespace
 // - eventHubName: eventHub.outputs.eventHubName
-// - storageBlobEndpoint: storage.outputs.blobEndpoint
 // - storageAccountName: storage.outputs.storageAccountName
 
 module functionApp 'modules/function.bicep' = {
   name: 'deploy-function-app'
+  scope: resourceGroup
   params: {
     workloadName: workloadName
     location: location
-    // TODO: Voeg de overige parameters toe
-    // Hint: gebruik outputs van de andere modules
-    // eventHubNamespace: eventHub.outputs.???
-    // eventHubName: eventHub.outputs.???
-    // storageBlobEndpoint: storage.outputs.???
-    // storageAccountName: storage.outputs.???
+    // TODO: Voeg de overige parameters toe (gebruik outputs van andere modules)
+    // eventHubNamespace: eventHub.outputs.fullyQualifiedNamespace
+    // eventHubName: eventHub.outputs.eventHubName
+    // storageAccountName: storage.outputs.storageAccountName
   }
 }
 
 // -----------------------------------------------------------------------------
-// STAP 2: Storage Account
+// STAP 4: RBAC Role Assignments
 // -----------------------------------------------------------------------------
 
-// TODO: Roep de storage module aan
+// TODO: Ken RBAC roles toe zodat de Function App toegang heeft
+// Dit moet NA de Function App omdat we de principalId nodig hebben
 //
-// Parameters die de storage module nodig heeft:
-// - workloadName: param workloadName
-// - location: param location
-// - functionAppPrincipalId: functionApp.outputs.principalId
-//
-// Let op: functionAppPrincipalId is nodig voor RBAC!
+// Storage Blob Data Contributor: ba92f5b4-2d11-453d-a403-e96b0029c9fe
+// Event Hubs Data Receiver: a638d3c7-ab3a-418d-83e6-5f17a39d4fde
 
-module storage 'modules/storage.bicep' = {
-  name: 'deploy-storage'
+module rbacAssignments 'modules/rbac.bicep' = {
+  name: 'deploy-rbac'
+  scope: resourceGroup
   params: {
-    workloadName: workloadName
-    location: location
-    // TODO: Voeg functionAppPrincipalId toe
-    // Hint: functionApp.outputs.principalId
-  }
-}
-
-// -----------------------------------------------------------------------------
-// STAP 3: Event Hub
-// -----------------------------------------------------------------------------
-
-// TODO: Roep de eventhub module aan
-//
-// Parameters die de eventhub module nodig heeft:
-// - workloadName: param workloadName
-// - location: param location
-// - functionAppPrincipalId: functionApp.outputs.principalId
-
-module eventHub 'modules/eventhub.bicep' = {
-  name: 'deploy-eventhub'
-  params: {
-    workloadName: workloadName
-    location: location
-    // TODO: Voeg functionAppPrincipalId toe
+    functionAppPrincipalId: functionApp.outputs.principalId
+    storageAccountName: storage.outputs.storageAccountName
+    eventHubNamespaceName: eventHub.outputs.namespaceName
   }
 }
 
@@ -111,8 +123,11 @@ module eventHub 'modules/eventhub.bicep' = {
 // OUTPUTS
 // =============================================================================
 // Deze outputs zijn beschikbaar na deployment via:
-// az deployment group show --name main --query 'properties.outputs'
+// az deployment sub show --name main --query 'properties.outputs'
 // =============================================================================
+
+@description('Naam van de Resource Group')
+output resourceGroupName string = resourceGroup.name
 
 @description('Naam van de Function App')
 output functionAppName string = functionApp.outputs.functionAppName

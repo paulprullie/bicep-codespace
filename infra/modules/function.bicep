@@ -17,10 +17,7 @@ param eventHubNamespace string
 @description('Event Hub naam')
 param eventHubName string
 
-@description('Storage Account blob endpoint')
-param storageBlobEndpoint string
-
-@description('Storage Account naam (voor Function App internal storage)')
+@description('Storage Account naam')
 param storageAccountName string
 
 // -----------------------------------------------------------------------------
@@ -105,9 +102,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
       //
       // 5. EventHubName = eventHubName
       //
-      // 6. StorageBlobEndpoint = storageBlobEndpoint
-      //
-      // 7. StorageAccountName = storageAccountName
+      // 6. StorageAccountName = storageAccountName
 
       appSettings: [
         // TODO: Voeg alle app settings toe als objects:

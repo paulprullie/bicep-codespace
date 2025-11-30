@@ -144,8 +144,26 @@ infra/
 └── modules/
     ├── storage.bicep       # Storage Account + Blob container
     ├── eventhub.bicep      # Event Hub namespace + hub
-    └── function.bicep      # Function App + Managed Identity
+    ├── function.bicep      # Function App + Managed Identity
+    └── rbac.bicep          # RBAC role assignments
 ```
+
+---
+
+### ✅ Resource Group (`main.bicep`)
+
+**Doel:** Container voor alle resources, aangemaakt op subscription scope
+
+```bicep
+targetScope = 'subscription'
+
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
+  name: 'rg-${workloadName}'
+  location: location
+}
+```
+
+> **Let op:** Modules krijgen `scope: resourceGroup` om ze in de juiste resource group te deployen.
 
 ---
 
@@ -162,12 +180,6 @@ infra/
 
 > 💡 **Virtuele folders:** Blob namen zoals `2025/12/02/events.json` worden in de Portal als folders weergegeven!
 
-**RBAC toekennen:**
-```bicep
-// Role Definition ID voor Storage Blob Data Contributor
-'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
-```
-
 ---
 
 ### ✅ Event Hub (`modules/eventhub.bicep`)
@@ -180,12 +192,6 @@ infra/
 | Namespace | `sku.capacity` | `1` |
 | Event Hub | `messageRetentionInDays` | `1` |
 | Event Hub | `partitionCount` | `2` |
-
-**RBAC toekennen:**
-```bicep
-// Role Definition ID voor Azure Event Hubs Data Receiver
-'a638d3c7-ab3a-418d-83e6-5f17a39d4fde'
-```
 
 ---
 
@@ -218,21 +224,30 @@ appSettings: [
 
 ### ✅ Main Orchestrator (`main.bicep`)
 
-**Doel:** Alle modules verbinden
+**Doel:** Alle modules verbinden in de juiste volgorde
 
 ```bicep
-// Module aanroep syntax
-module storage 'modules/storage.bicep' = {
-  name: 'deploy-storage'
-  params: {
-    workloadName: workloadName
-    location: location
-    functionAppPrincipalId: functionApp.outputs.principalId  // <-- Koppeling!
-  }
-}
+// Volgorde om circulaire dependencies te voorkomen:
+// 1. Storage Account
+// 2. Event Hub
+// 3. Function App (heeft Storage/EventHub outputs nodig)
+// 4. RBAC (heeft Function App principalId nodig)
 ```
 
-**Let op de volgorde:** Function App moet eerst (voor de `principalId`)
+> **Let op de volgorde:** Function App heeft de outputs van Storage en Event Hub nodig. RBAC komt als laatste omdat het de `principalId` van de Function App nodig heeft.
+
+---
+
+### ✅ RBAC Role Assignments (`modules/rbac.bicep`)
+
+**Doel:** Managed Identity toegang geven tot resources
+
+| Rol | Role Definition ID | Toegang tot |
+|-----|-------------------|-------------|
+| Storage Blob Data Contributor | `ba92f5b4-2d11-453d-a403-e96b0029c9fe` | Blob Storage |
+| Event Hubs Data Receiver | `a638d3c7-ab3a-418d-83e6-5f17a39d4fde` | Event Hub |
+
+> **Waarom apart?** RBAC heeft de `principalId` van de Function App nodig, die pas beschikbaar is na deployment van de Function App.
 
 ---
 
@@ -243,13 +258,13 @@ module storage 'modules/storage.bicep' = {
 az bicep build --file infra/main.bicep
 
 # What-If (zie wat er gaat gebeuren)
-az deployment group what-if \
-  --resource-group rg-iot-workshop-jouwinitialen \
+az deployment sub what-if \
+  --location westeurope \
   --template-file infra/main.bicep \
   --parameters infra/main.bicepparam
 ```
 
-> **Belangrijk:** Vervang `jouwinitialen` door je eigen initialen (bijv. `rg-iot-workshop-jd` voor Jan de Vries). Zo heeft elke student een unieke resource group.
+> **Let op:** We gebruiken `az deployment sub` omdat de scope op subscription niveau is (de resource group wordt door Bicep aangemaakt).
 
 ### 💡 Tips
 
@@ -307,7 +322,6 @@ on:
     branches: [main]
 
 env:
-  RESOURCE_GROUP: rg-iot-workshop-jouwinitialen  # Pas aan naar jouw initialen!
   LOCATION: westeurope
 
 jobs:
@@ -329,9 +343,8 @@ jobs:
 
       - name: What-If Analysis
         run: |
-          az group create --name $RESOURCE_GROUP --location $LOCATION -o none || true
-          az deployment group what-if \
-            --resource-group $RESOURCE_GROUP \
+          az deployment sub what-if \
+            --location $LOCATION \
             --template-file ./infra/main.bicep \
             --parameters ./infra/main.bicepparam
 
@@ -350,13 +363,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Create Resource Group
-        run: az group create --name $RESOURCE_GROUP --location $LOCATION
-
       - name: Deploy Bicep
         run: |
-          az deployment group create \
-            --resource-group $RESOURCE_GROUP \
+          az deployment sub create \
+            --location $LOCATION \
             --template-file ./infra/main.bicep \
             --parameters ./infra/main.bicepparam
 ```
