@@ -70,15 +70,19 @@ Consistente naamgeving is essentieel voor professionele infrastructuur.
 
 We gebruiken een **Dev Container** om ervoor te zorgen dat iedereen dezelfde omgeving heeft met alle tools (**Azure CLI**, **Bicep CLI**, **Python**) geïnstalleerd.
 
-### 🛑 Belangrijkste Eerste Stap: Forken!
+---
 
-Voordat je begint, **moet je deze repository forken** naar je eigen GitHub-account.
+### 🐙 Pad A: GitHub
+
+#### Stap 1: Fork de Repository
 
 1. Ga naar de hoofdpagina van deze repository
 2. Klik rechtsboven op de knop **"Fork"**
 3. Werk voortaan altijd in jouw eigen forked repository
 
-### 🥇 Optie 1: GitHub Codespaces (Aanbevolen)
+#### Stap 2: Start je Werkomgeving
+
+**Optie 1: GitHub Codespaces (Aanbevolen)**
 
 Dit is de snelste manier om te starten, direct in je browser:
 
@@ -86,12 +90,30 @@ Dit is de snelste manier om te starten, direct in je browser:
 2. Klik op de groene knop **`< > Code`**
 3. Kies het tabblad **Codespaces** en klik op **"Create codespace on main"**
 
-### 🥈 Optie 2: Lokale VS Code Dev Container
-
-Als je liever lokaal werkt:
+**Optie 2: Lokale VS Code Dev Container**
 
 1. **Vereisten:** VS Code, Docker (draaiend) en de Dev Containers extensie
 2. Kloon jouw forked repository lokaal
+3. Open de map in VS Code
+4. Klik op **"Reopen in Container"** wanneer VS Code dit vraagt
+
+---
+
+### 🔷 Pad B: Azure DevOps
+
+#### Stap 1: Importeer de Repository
+
+1. Ga naar je Azure DevOps project → **Repos**
+2. Klik op **Import repository**
+3. Voer de URL van de bron-repository in
+4. Klik op **Import**
+
+#### Stap 2: Start je Werkomgeving (Lokale Dev Container)
+
+Azure DevOps heeft geen Codespaces, dus we gebruiken een lokale Dev Container:
+
+1. **Vereisten:** VS Code, Docker (draaiend) en de Dev Containers extensie
+2. Kloon de repository vanuit Azure DevOps lokaal
 3. Open de map in VS Code
 4. Klik op **"Reopen in Container"** wanneer VS Code dit vraagt
 
